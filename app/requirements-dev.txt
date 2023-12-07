@@ -4,7 +4,7 @@
 #
 #    pip-compile --extra=dev --output-file=app/requirements-dev.txt pyproject.toml
 #
-aiohttp==3.8.6
+aiohttp==3.9.0
     # via
     #   aiohttp-retry
     #   twilio
