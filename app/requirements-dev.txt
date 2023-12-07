@@ -47,7 +47,7 @@ click==8.1.7
     # via flask
 cloudinary==1.36.0
     # via chuut (pyproject.toml)
-cryptography==41.0.4
+cryptography==41.0.6
     # via paramiko
 flask==3.0.0
     # via
