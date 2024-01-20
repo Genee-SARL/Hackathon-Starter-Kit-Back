@@ -16,8 +16,7 @@ Genee est une entreprise Française, les documentations et les commits sont en f
 - [Marshmallow](https://marshmallow.readthedocs.io/en/stable/) : Une bibliothèque pour la conversion des types de
   données, la validation et la désérialisation.
 - [Docker](https://www.docker.com/) : Une plateforme de conteneurisation.
-- [Docker Compose](https://docs.docker.com/compose/) : Un outil pour définir et gérer des applications multi-conteneurs
-  avec Docker.
+
 
 ## Structure du Projet
 
