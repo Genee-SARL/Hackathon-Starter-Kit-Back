@@ -11,7 +11,6 @@ from marshmallow import ValidationError
 db: SQLAlchemy = SQLAlchemy()
 migrate = Migrate()
 
-
 def create_app(config):
     app = Flask(__name__)
     app.config.from_object(config)
@@ -31,6 +30,7 @@ def create_app(config):
     from data.hello_world.controllers import hello_world_blueprint
     app.register_blueprint(hello_world_blueprint, url_prefix=url_prefix)
 
+    import data.trader.models
     @app.errorhandler(ValidationError)
     def handle_custom_error(error):
         return str(error), 400

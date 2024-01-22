@@ -4,98 +4,152 @@
 #
 #    pip-compile --extra=dev --output-file=app/requirements-dev.txt pyproject.toml
 #
-alembic==1.13.0
+alembic==1.13.1
     # via
-    #   Hackathon-ESTIAM-Back (pyproject.toml)
+    #   MQL-Back (pyproject.toml)
     #   flask-migrate
+apscheduler==3.10.4
+    # via MQL-Back (pyproject.toml)
+attrs==23.2.0
+    # via
+    #   outcome
+    #   trio
+beautifulsoup4==4.12.3
+    # via bs4
 blinker==1.7.0
     # via flask
+bs4==0.0.2
+    # via MQL-Back (pyproject.toml)
 certifi==2023.11.17
-    # via requests
+    # via
+    #   requests
+    #   selenium
 charset-normalizer==3.3.2
     # via requests
 click==8.1.7
     # via flask
 exceptiongroup==1.2.0
-    # via pytest
-flask==3.0.0
     # via
-    #   Hackathon-ESTIAM-Back (pyproject.toml)
+    #   pytest
+    #   trio
+    #   trio-websocket
+flask==3.0.1
+    # via
+    #   MQL-Back (pyproject.toml)
     #   flask-cors
     #   flask-jwt-extended
     #   flask-migrate
     #   flask-sqlalchemy
 flask-blueprint==1.3.0
-    # via Hackathon-ESTIAM-Back (pyproject.toml)
+    # via MQL-Back (pyproject.toml)
 flask-cors==4.0.0
-    # via Hackathon-ESTIAM-Back (pyproject.toml)
-flask-jwt-extended==4.5.3
-    # via Hackathon-ESTIAM-Back (pyproject.toml)
+    # via MQL-Back (pyproject.toml)
+flask-jwt-extended==4.6.0
+    # via MQL-Back (pyproject.toml)
 flask-migrate==4.0.5
-    # via Hackathon-ESTIAM-Back (pyproject.toml)
+    # via MQL-Back (pyproject.toml)
 flask-sqlalchemy==3.1.1
     # via flask-migrate
+h11==0.14.0
+    # via wsproto
 idna==3.6
-    # via requests
-importlib-metadata==7.0.0
+    # via
+    #   requests
+    #   trio
+importlib-metadata==7.0.1
     # via flask
 iniconfig==2.0.0
     # via pytest
 itsdangerous==2.1.2
     # via flask
-jinja2==3.1.2
+jinja2==3.1.3
     # via flask
 load-dotenv==0.1.0
-    # via Hackathon-ESTIAM-Back (pyproject.toml)
+    # via MQL-Back (pyproject.toml)
 mako==1.3.0
     # via alembic
-markupsafe==2.1.3
+markupsafe==2.1.4
     # via
     #   jinja2
     #   mako
     #   werkzeug
-marshmallow==3.20.1
+marshmallow==3.20.2
     # via
-    #   Hackathon-ESTIAM-Back (pyproject.toml)
+    #   MQL-Back (pyproject.toml)
     #   marshmallow-sqlalchemy
-marshmallow-sqlalchemy==0.29.0
-    # via Hackathon-ESTIAM-Back (pyproject.toml)
+marshmallow-sqlalchemy==0.30.0
+    # via MQL-Back (pyproject.toml)
+outcome==1.3.0.post0
+    # via trio
 packaging==23.2
     # via
     #   marshmallow
     #   marshmallow-sqlalchemy
     #   pytest
+    #   webdriver-manager
 pluggy==1.3.0
     # via pytest
-psycopg2==2.9.9
-    # via Hackathon-ESTIAM-Back (pyproject.toml)
+psycopg2-binary==2.9.9
+    # via MQL-Back (pyproject.toml)
 pyjwt==2.8.0
     # via flask-jwt-extended
-pytest==7.4.3
-    # via Hackathon-ESTIAM-Back (pyproject.toml)
+pysocks==1.7.1
+    # via urllib3
+pytest==7.4.4
+    # via MQL-Back (pyproject.toml)
 python-dotenv==1.0.0
-    # via load-dotenv
-requests==2.31.0
-    # via Hackathon-ESTIAM-Back (pyproject.toml)
-sqlalchemy==2.0.23
     # via
-    #   Hackathon-ESTIAM-Back (pyproject.toml)
+    #   load-dotenv
+    #   webdriver-manager
+pytz==2023.3.post1
+    # via apscheduler
+requests==2.31.0
+    # via
+    #   MQL-Back (pyproject.toml)
+    #   webdriver-manager
+selenium==4.16.0
+    # via MQL-Back (pyproject.toml)
+six==1.16.0
+    # via apscheduler
+sniffio==1.3.0
+    # via trio
+sortedcontainers==2.4.0
+    # via trio
+soupsieve==2.5
+    # via beautifulsoup4
+sqlalchemy==2.0.25
+    # via
+    #   MQL-Back (pyproject.toml)
     #   alembic
     #   flask-sqlalchemy
     #   marshmallow-sqlalchemy
 tomli==2.0.1
     # via pytest
+trio==0.24.0
+    # via
+    #   selenium
+    #   trio-websocket
+trio-websocket==0.11.1
+    # via selenium
 typing-extensions==4.9.0
     # via
     #   alembic
     #   sqlalchemy
-urllib3==2.1.0
-    # via requests
+tzlocal==5.2
+    # via apscheduler
+urllib3[socks]==2.1.0
+    # via
+    #   requests
+    #   selenium
 uwsgi==2.0.23
-    # via Hackathon-ESTIAM-Back (pyproject.toml)
+    # via MQL-Back (pyproject.toml)
+webdriver-manager==4.0.1
+    # via MQL-Back (pyproject.toml)
 werkzeug==3.0.1
     # via
     #   flask
     #   flask-jwt-extended
+wsproto==1.2.0
+    # via trio-websocket
 zipp==3.17.0
     # via importlib-metadata

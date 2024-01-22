@@ -5,7 +5,7 @@ description = 'Backend for the MQL Trading Bot'
 requires-python = '>=3.11'
 dependencies = [
     'alembic',
-    'psycopg2',
+    'psycopg2-binary',
     'Flask',
     'flask-blueprint',
     'Flask-Cors',
@@ -18,6 +18,10 @@ dependencies = [
     'load_dotenv',
     'pytest',
     'Flask-JWT-Extended',
+    'selenium',
+    'bs4',
+    'webdriver-manager',
+    'apscheduler',
 ]
 
 [pyproject.optional-dependencies]
