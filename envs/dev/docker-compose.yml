@@ -4,7 +4,7 @@ services:
   postgres:
     build:
       context: ../shared/postgres
-    image: starter-postgres:dev
+    image: mql-postgres:dev
     ports:
       - "5432:5432"
     networks:
@@ -16,13 +16,13 @@ services:
       - FLASK_DEBUG=1
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    container_name: starter_postgres
+    container_name: mql_postgres
 
   flask:
     build:
       context: ../../
       dockerfile: envs/dev/back/Dockerfile
-    image: starter-back:dev
+    image: mql-back:dev
     networks:
       - network
     volumes:
@@ -38,7 +38,7 @@ services:
     ports:
       - "5678:5678"
       - "5001:5001"
-    container_name: starter_back
+    container_name: mql_back
 
 
 volumes:

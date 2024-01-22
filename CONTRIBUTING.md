@@ -1,8 +1,8 @@
-# STARTER-BACK
+# MQL-BACK
 
 <img src="./doc/assets/genee.png" alt="Image 1" width="150px">
 
-STARTER-BACK est un projet de backend développé avec [Python](https://www.python.org/)
+MQL-BACK est un projet de backend développé avec [Python](https://www.python.org/)
 et [Flask](https://flask.palletsprojects.com/en/2.3.x/).
 
 ## Gestion de version Git

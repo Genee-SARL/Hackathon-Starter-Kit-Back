@@ -1,7 +1,7 @@
 [project]
-name = 'Hackathon-ESTIAM-Back'
+name = 'MQL-Back'
 version = '1.0.0'
-description = 'Backend for the Hackathon organised by ESTIAM'
+description = 'Backend for the MQL Trading Bot'
 requires-python = '>=3.11'
 dependencies = [
     'alembic',
