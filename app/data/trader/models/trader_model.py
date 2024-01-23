@@ -13,3 +13,7 @@ class TraderModel(db.Model):
     trader_url = Column(String, nullable=False)
     valid = Column(Boolean, nullable=False)
     positions = relationship("TraderPositionModel", back_populates="trader")
+
+    @staticmethod
+    def get_all_traders():
+        return TraderModel.query.all()
