@@ -31,6 +31,7 @@ def create_app(config):
     app.register_blueprint(hello_world_blueprint, url_prefix=url_prefix)
 
     import data.trader.models
+    from data.trader.models.trader_model import TraderModel
     @app.errorhandler(ValidationError)
     def handle_custom_error(error):
         return str(error), 400
@@ -39,5 +40,17 @@ def create_app(config):
 
     with app.app_context():
         db.create_all()
+        trader1 = TraderModel(id_trader='1904259',
+                              trader_url='https://www.mql5.com/en/signals/1904259?source=Site+Signals+Subscriptions',
+                              valid=True)
+        trader2 = TraderModel(id_trader='2068879',
+                              trader_url='https://www.mql5.com/en/signals/2068879?source=Site+Signals+Subscriptions',
+                              valid=True)
+
+        db.session.add(trader1)
+        db.session.add(trader2)
+        db.session.commit()
+
+
 
     return app
