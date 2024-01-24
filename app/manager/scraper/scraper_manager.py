@@ -1,5 +1,6 @@
 import os
 import time
+import sys
 from datetime import datetime
 
 from bs4 import BeautifulSoup
@@ -75,8 +76,6 @@ class ScraperManager:
                         }
                     )
                 continue
-        if not position_table:
-            raise IndexError("Trader is not followed")
         position_table = sorted(
             position_table, key=lambda x: datetime.strptime(x["Time"], "%Y.%m.%d %H:%M"), reverse=True
         )
@@ -140,6 +139,9 @@ class ScraperManager:
                     time.sleep(5)
                     soup = BeautifulSoup(driver.page_source, "html.parser")
                     s_list_info = soup.find("div", class_="s-list-info")
+                    if not s_list_info:
+                        print('Trader not followed', file=sys.stderr)
+                        continue
                     balance = self.extract_value("Balance", s_list_info)
                     equity = self.extract_value("Equity", s_list_info)
                     register_daily_drowdown(trader.id_trader, balance - equity)
