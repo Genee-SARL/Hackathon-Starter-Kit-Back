@@ -1,9 +1,13 @@
 import os
 import time
 import sys
+import requests
+import json
 from datetime import datetime
 
 from bs4 import BeautifulSoup
+
+from data.group.services import get_group_ip_by_user_id
 from data.trader.services import (
     get_all_position_from_trader,
     get_all_traders_id,
@@ -22,19 +26,24 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 
+from data.user.services.user_service import get_all_users, update_user_daily_balance, update_user_balance
+from manager.trade import TradeManager
+
 
 class ScraperManager:
+    load_dotenv()
     user_login = os.getenv("MQ5_LOGIN")
     password = os.getenv("MQ5_PASSWORD")
-    load_dotenv()
     options = Options()
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
+    options.add_argument("--log-level=3")
     user_agent = (
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36"
     )
     options.add_argument(f"user-agent={user_agent}")
     url = "https://www.mql5.com/en"
+    trade_manager = TradeManager()
 
     def login(self, driver, user_login, user_password):
         driver.get(self.url + "/auth_login")
@@ -62,46 +71,48 @@ class ScraperManager:
         rows = results.find_elements(By.TAG_NAME, "tr")
         for row in rows:
             cols = row.find_elements(By.TAG_NAME, "td")
-            if symbole_index < len(cols):
-                if cols[symbole_index].text != "":
-                    position_type = cols[type_index].text
-                    if position_type not in ["Buy", "Sell"]:
-                        continue
-                    position_table.append(
-                        {
-                            "Symbol": cols[symbole_index].text,
-                            "Time": cols[time_index].text,
-                            "Type": cols[type_index].text,
-                            "Volume": cols[volume_index].text,
-                        }
-                    )
-                continue
+            if len(cols) > max(time_index, symbole_index, type_index, volume_index):
+                if symbole_index < len(cols):
+                    if cols[symbole_index].text != "":
+                        position_type = cols[type_index].text
+                        if position_type not in ["Buy", "Sell"]:
+                            continue
+                        position_table.append(
+                            {
+                                "Symbol": cols[symbole_index].text,
+                                "Time": cols[time_index].text,
+                                "Type": cols[type_index].text,
+                                "Volume": cols[volume_index].text,
+                            }
+                        )
+                    continue
         position_table = sorted(
             position_table, key=lambda x: datetime.strptime(x["Time"], "%Y.%m.%d %H:%M"), reverse=True
         )
         return position_table
 
-    @staticmethod
-    def detect_changes(current_position, saved_position, trader_id):
+    def detect_changes(self, current_position, saved_position, trader_id):
         if not saved_position:
             for position in current_position:
                 post_new_position(trader_id, position)
-
+                self.trade_manager.open_orders_for_user(current_position, trader_id)
             return
         if not current_position:
             for position in saved_position:
                 remove_position(trader_id, position)
-
+                self.trade_manager.close_orders_for_user(saved_position, trader_id)
             return
         added_positions = [pos for pos in current_position if pos not in saved_position]
         removed_positions = [pos for pos in saved_position if pos not in current_position]
         if added_positions:
             for position in added_positions:
                 post_new_position(trader_id, position)
+                self.trade_manager.open_orders_for_user(added_positions, trader_id)
 
         if removed_positions:
             for position in removed_positions:
                 remove_position(trader_id, position)
+                self.trade_manager.close_orders_for_user(removed_positions, trader_id)
 
     @staticmethod
     def extract_value(label_text, s_list_info):
@@ -126,7 +137,7 @@ class ScraperManager:
                 time.sleep(5)
                 equity = self.extract_value("Equity", s_list_info)
                 balance = self.extract_value("Balance", s_list_info)
-                register_daily_drowdown_anchor(trader.id_trader, balance - equity)
+                register_daily_drowdown_anchor(trader.id_trader, balance)
 
     def check_traders_position(self, app):
         with app.app_context():
@@ -139,20 +150,35 @@ class ScraperManager:
                     time.sleep(5)
                     soup = BeautifulSoup(driver.page_source, "html.parser")
                     s_list_info = soup.find("div", class_="s-list-info")
-                    if not s_list_info:
+                    signaldatahidden = soup.find("tr", class_="signalDataHidden")
+                    if signaldatahidden:
                         print('Trader not followed', file=sys.stderr)
                         continue
                     balance = self.extract_value("Balance", s_list_info)
                     equity = self.extract_value("Equity", s_list_info)
-                    register_daily_drowdown(trader.id_trader, balance - equity)
+                    register_daily_drowdown(trader.id_trader, equity - balance)
                     column_table = driver.find_element(By.XPATH, '//*[@id="signal_tab_content_trading"]/table/thead')
                     results = driver.find_element(By.XPATH, '//*[@id="signal_tab_content_trading"]/table/tbody')
                     column = column_table.find_elements(By.TAG_NAME, "th")
-                    self.detect_changes(
-                        self.get_trader_positions(results, column),
-                        get_all_position_from_trader(trader.id_trader),
-                        trader.id_trader,
-                    )
+                    trader_positions = self.get_trader_positions(results, column)
+                    saved_positions = get_all_position_from_trader(trader.id_trader)
+                    self.detect_changes(trader_positions, saved_positions, trader.id_trader)
                 driver.quit()
             except Exception as e:
                 print(e)
+
+    @staticmethod
+    def check_user_balance(app, code):
+        with app.app_context():
+            users = get_all_users()
+            for user in users:
+                ip, port = get_group_ip_by_user_id(user["id_user"])
+                url = f"http://{ip}:{port}/api/user_balance/"
+                response = requests.get(url, data=json.dumps(user), headers={"Content-Type": "application/json"})
+                if response.status_code == 200:
+                    balance = response.json().get('balance')
+                    if balance is not None:
+                        if code == 1:
+                            update_user_balance(user["id_user"], balance)
+                        else:
+                            update_user_daily_balance(user["id_user"], balance)

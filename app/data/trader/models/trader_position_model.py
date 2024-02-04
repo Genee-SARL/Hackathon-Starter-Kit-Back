@@ -1,7 +1,8 @@
-from sqlalchemy import Column, String, Float, DateTime, Boolean, ForeignKey, Enum
+from sqlalchemy import Column, String, Float, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from data.position.enums import PositionTypeEnum
 from shared import db
+
 
 class TraderPositionModel(db.Model):
     __tablename__ = 'trader_position'

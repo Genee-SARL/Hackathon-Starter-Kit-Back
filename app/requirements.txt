@@ -141,7 +141,6 @@ urllib3[socks]==2.1.0
     # via
     #   requests
     #   selenium
-uwsgi==2.0.23
     # via MQL-Back (pyproject.toml)
 webdriver-manager==4.0.1
     # via MQL-Back (pyproject.toml)
