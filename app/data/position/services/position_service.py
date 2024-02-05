@@ -52,6 +52,7 @@ def remove_position(id_order):
     position = PositionModel.query.get(id_order)
     if position:
         db.session.delete(position)
+        db.session.flush()
         db.session.commit()
         return {'message': 'Position successfully deleted'}, 200
     else:

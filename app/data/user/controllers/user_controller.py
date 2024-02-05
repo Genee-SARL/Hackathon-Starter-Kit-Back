@@ -2,7 +2,7 @@
 
 from flask import Blueprint, request
 
-from data.user.services import create_user, remove_user
+from data.user.services import create_user, remove_user, close_user_positions
 
 NAME = 'User'
 
@@ -22,7 +22,7 @@ def get_all_group():
 
 
 @user_blueprint.post(f"/user/close/<string:id_user>")
-def close_user_positions(id_user):
+def close_positions(id_user):
     try:
         entity = close_user_positions(id_user)
         return entity

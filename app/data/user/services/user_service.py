@@ -1,6 +1,9 @@
 import requests
 import json
+import datetime
 from data.group.services import get_group_ip_by_user_id
+from data.position.enums import PositionTypeEnum
+from data.position.services import remove_position
 from data.user.models import UserModel
 from data.user.schemas import UserSchema
 from shared import db
@@ -92,6 +95,23 @@ def remove_user(id_user):
         return jsonify({'message': 'User not found'}), 404
 
 
+class CustomEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime.datetime):
+            return o.isoformat()
+        if isinstance(o, PositionTypeEnum):
+            return o.value
+        if hasattr(o, '__dict__'):
+            obj_dict = o.__dict__.copy()
+            obj_dict.pop('_sa_instance_state', None)
+            obj_dict.pop('user_position', None)
+            obj_dict.pop('users', None)
+            obj_dict.pop('traders', None)
+            return obj_dict
+
+        return super().default(o)
+
+
 def close_user_positions(id_user):
     user = UserModel.query.get(id_user)
     if user:
@@ -100,12 +120,14 @@ def close_user_positions(id_user):
         headers = {'Content-Type': 'application/json'}
         data = {
             "positions": user.positions,
-            "user": user
+            "user": user,
         }
-        requests.delete(url, headers=headers, data=json.dumps(data))
-        for position in user.positions:
-            db.session.delete(position)
-        db.session.commit()
-        return jsonify({'message': 'User positions successfully closed'}), 200
+        response = requests.delete(url, headers=headers, data=CustomEncoder().encode(data))
+        if response.status_code == 200:
+            for position in user.positions:
+                remove_position(position.id_order)
+            return jsonify({'message': 'User positions successfully closed'}), 200
+        else:
+            return response.json(), response.status_code
     else:
         return jsonify({'message': 'User not found'}), 404

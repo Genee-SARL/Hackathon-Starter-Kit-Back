@@ -95,24 +95,24 @@ class ScraperManager:
         if not saved_position:
             for position in current_position:
                 post_new_position(trader_id, position)
-                self.trade_manager.open_orders_for_user(current_position, trader_id)
+            self.trade_manager.open_orders_for_user(current_position, trader_id)
             return
         if not current_position:
             for position in saved_position:
                 remove_position(trader_id, position)
-                self.trade_manager.close_orders_for_user(saved_position, trader_id)
+            self.trade_manager.close_orders_for_user(saved_position, trader_id)
             return
         added_positions = [pos for pos in current_position if pos not in saved_position]
         removed_positions = [pos for pos in saved_position if pos not in current_position]
         if added_positions:
             for position in added_positions:
                 post_new_position(trader_id, position)
-                self.trade_manager.open_orders_for_user(added_positions, trader_id)
+            self.trade_manager.open_orders_for_user(added_positions, trader_id)
 
         if removed_positions:
             for position in removed_positions:
                 remove_position(trader_id, position)
-                self.trade_manager.close_orders_for_user(removed_positions, trader_id)
+            self.trade_manager.close_orders_for_user(removed_positions, trader_id)
 
     @staticmethod
     def extract_value(label_text, s_list_info):
@@ -167,18 +167,6 @@ class ScraperManager:
             except Exception as e:
                 print(e)
 
-    @staticmethod
-    def check_user_balance(app, code):
+    def check_user(self, app, code):
         with app.app_context():
-            users = get_all_users()
-            for user in users:
-                ip, port = get_group_ip_by_user_id(user["id_user"])
-                url = f"http://{ip}:{port}/api/user_balance/"
-                response = requests.get(url, data=json.dumps(user), headers={"Content-Type": "application/json"})
-                if response.status_code == 200:
-                    balance = response.json().get('balance')
-                    if balance is not None:
-                        if code == 1:
-                            update_user_balance(user["id_user"], balance)
-                        else:
-                            update_user_daily_balance(user["id_user"], balance)
+            self.trade_manager.check_user_position(code)
