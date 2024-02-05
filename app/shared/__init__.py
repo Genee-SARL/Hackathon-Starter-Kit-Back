@@ -11,6 +11,9 @@ from marshmallow import ValidationError
 db: SQLAlchemy = SQLAlchemy()
 migrate = Migrate()
 
+from data.user.models.user_model import UserModel
+from data.group.models.group_model import GroupModel
+
 
 def create_app(config):
     app = Flask(__name__)
@@ -28,9 +31,16 @@ def create_app(config):
 
     url_prefix = "/api"
 
-    from data.hello_world.controllers import hello_world_blueprint
-    app.register_blueprint(hello_world_blueprint, url_prefix=url_prefix)
+    from data.group.controllers import group_blueprint
+    from data.user.controllers import user_blueprint
+    from data.trader.controllers import trader_blueprint
+    app.register_blueprint(group_blueprint, url_prefix=url_prefix)
+    app.register_blueprint(user_blueprint, url_prefix=url_prefix)
+    app.register_blueprint(trader_blueprint, url_prefix=url_prefix)
 
+    with app.app_context():
+        from data.group.models.group_model import group_user_association
+        from data.group.models.group_model import group_trader_association
     @app.errorhandler(ValidationError)
     def handle_custom_error(error):
         return str(error), 400

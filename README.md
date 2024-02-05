@@ -1,4 +1,4 @@
-# STARTER-BACK
+# MQL-BACK
 
 <img src="./doc/assets/genee.png" alt="Image 1" width="150px">
 
